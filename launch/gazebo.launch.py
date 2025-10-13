@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 from ament_index_python.packages import get_package_share_directory
 
@@ -31,7 +30,6 @@ ARGUMENTS = [
 def generate_launch_description():
     # Paths
     pkg_alpha_simulation = get_package_share_directory("alpha_simulation")
-    pkg_alpha_description = get_package_share_directory("alpha_description")
     pkg_ros_gz_sim = get_package_share_directory("ros_gz_sim")
 
     gz_sim_launch = PathJoinSubstitution([pkg_ros_gz_sim, "launch", "gz_sim.launch.py"])
@@ -43,7 +41,6 @@ def generate_launch_description():
             [
                 os.path.join(pkg_alpha_simulation, "worlds"),
                 os.path.join(pkg_alpha_simulation, "models"),
-                str(Path(pkg_alpha_description).parent.resolve()),
             ]
         ),
     )
