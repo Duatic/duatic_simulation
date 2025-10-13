@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>alpha_simulation</name>
+  <name>duatic_simulation</name>
   <version>0.0.0</version>
-  <description>Sim Interface for Alpha Robot</description>
-  <maintainer email="mbloechli@student.ethz.ch">root</maintainer>
+  <description>Sim Interface for Duatic Robots</description>
+  <maintainer email="mbloechli@student.ethz.ch">Marc Blöchlinger</maintainer>
   <license>Duatic</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

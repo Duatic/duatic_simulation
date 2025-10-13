@@ -5,7 +5,7 @@ from launch_ros.actions import Node
 
 ARGUMENTS = [
     DeclareLaunchArgument(
-        "namespace", default_value="empty_namespace", description="Robot namespace"
+        "namespace", default_value="empty_namespace", description="entity namespace"
     ),
     DeclareLaunchArgument("x", default_value="0.0", description="x position"),
     DeclareLaunchArgument("y", default_value="0.0", description="y position"),
@@ -16,7 +16,7 @@ ARGUMENTS = [
 
 def generate_launch_description():
 
-    spawn_robot = Node(
+    spawn_entity = Node(
         package="ros_gz_sim",
         namespace=LaunchConfiguration("namespace"),
         name="create",
@@ -40,5 +40,5 @@ def generate_launch_description():
 
     # Create launch description and add actions
     ld = LaunchDescription(ARGUMENTS)
-    ld.add_action(spawn_robot)
+    ld.add_action(spawn_entity)
     return ld

@@ -29,7 +29,7 @@ ARGUMENTS = [
 
 def generate_launch_description():
     # Paths
-    pkg_alpha_simulation = get_package_share_directory("alpha_simulation")
+    pkg_duatic_simulation = get_package_share_directory("duatic_simulation")
     pkg_ros_gz_sim = get_package_share_directory("ros_gz_sim")
 
     gz_sim_launch = PathJoinSubstitution([pkg_ros_gz_sim, "launch", "gz_sim.launch.py"])
@@ -39,8 +39,8 @@ def generate_launch_description():
         name="GZ_SIM_RESOURCE_PATH",
         value=":".join(
             [
-                os.path.join(pkg_alpha_simulation, "worlds"),
-                os.path.join(pkg_alpha_simulation, "models"),
+                os.path.join(pkg_duatic_simulation, "worlds"),
+                os.path.join(pkg_duatic_simulation, "models"),
             ]
         ),
     )
