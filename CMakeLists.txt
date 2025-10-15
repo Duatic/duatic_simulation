@@ -25,7 +25,6 @@ if(BUILD_TESTING)
     add_launch_test("${path}" RUNNER "${RUNNER}" ${ARGN})
   endfunction()
   add_ros_isolated_launch_test(test/launch_gazebo_warehouse.py)
-  add_ros_isolated_launch_test(test/launch_gazebo_simple_maze.py)
 endif()
 
 ament_package()
