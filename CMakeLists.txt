@@ -11,9 +11,19 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
+# Install  directories
 install(DIRECTORY
-  launch worlds models
+  launch
+  worlds
+  models
+  docker
   DESTINATION share/${PROJECT_NAME}/
+)
+
+# Install scripts as executables
+install(PROGRAMS
+  scripts/start_sim.py
+  DESTINATION lib/${PROJECT_NAME}/
 )
 
 if(BUILD_TESTING)

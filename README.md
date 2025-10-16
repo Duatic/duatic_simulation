@@ -14,6 +14,28 @@ Provides Gazebo Harmonic simulation worlds, robot spawning, and ROS-Gazebo bridg
 
 ### Launch Simulation Environment
 
+#### Using ROS Node (Recommended)
+
+The `start_sim` node provides a managed way to start and stop the simulation. It automatically ensures the simulation container is properly shut down when the node terminates.
+
+```bash
+# Empty world (default)
+ros2 run duatic_simulation start_sim.py
+
+# Warehouse world
+ros2 run duatic_simulation start_sim.py --ros-args -p world:=warehouse
+
+# Headless simulation
+ros2 run duatic_simulation start_sim.py --ros-args -p world:=warehouse -p headless:=true
+```
+
+**Benefits:**
+- Automatic cleanup: Docker container is stopped when node shuts down (Ctrl+C)
+- ROS integration: Works as a standard ROS node with parameters
+- Process management: Proper lifecycle handling
+
+#### Using Launch File Directly
+
 ```bash
 # Empty world (default)
 ros2 launch duatic_simulation gazebo.launch.py
@@ -55,6 +77,27 @@ ros2 launch duatic_simulation ros_gz_bridge.launch.py \
 | `gazebo.launch.py` | Main simulation environment |
 | `spawn.launch.py` | Robot spawning interface |
 | `ros_gz_bridge.launch.py` | ROS-Gazebo topic bridge |
+
+## Nodes
+
+### start_sim.py
+
+ROS 2 node that manages the simulation Docker container lifecycle.
+
+**Parameters:**
+- `world` (string, default: "empty"): World name to load
+- `headless` (bool, default: false): Run simulation without GUI
+
+**Features:**
+- Starts simulation container using docker compose
+- Automatically stops container on node shutdown
+- Proper cleanup with Ctrl+C
+- ROS parameter support
+
+**Example:**
+```bash
+ros2 run duatic_simulation start_sim.py --ros-args -p world:=warehouse -p headless:=false
+```
 
 ## Parameters
 

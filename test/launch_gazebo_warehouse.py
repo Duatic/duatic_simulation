@@ -2,32 +2,32 @@ import warnings
 import unittest
 
 import rclpy
-from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, TimerAction
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution
+from launch.actions import TimerAction
+from launch_ros.actions import Node
 import launch_testing
 import rosgraph_msgs.msg
 
-from duatic_testing.testing_helpers import wait_for_node, wait_for_message
+from duatic_ros2_testing.tests import wait_for_node, wait_for_message
 
 ARGUMENTS = [("world", "warehouse"), ("headless", "true")]
 
 
 def generate_test_description():
     """Generate a LaunchDescription for the test."""
-    pkg_simulation = get_package_share_directory("duatic_simulation")
-    path_simulation = PathJoinSubstitution([pkg_simulation, "launch", "gazebo.launch.py"])
 
-    launch_simulation = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([path_simulation]), launch_arguments=ARGUMENTS
+    simulation = Node(
+        package="duatic_simulation",
+        executable="start_sim.py",
+        name="simulation",
+        output="screen",
+        arguments=ARGUMENTS,
     )
 
     ready = TimerAction(period=0.5, actions=[launch_testing.actions.ReadyToTest()])
 
     ld = LaunchDescription()
-    ld.add_action(launch_simulation)
+    ld.add_action(simulation)
     ld.add_action(ready)
 
     return ld

@@ -1,0 +1,13 @@
+services:
+    simulation:
+      command: bash -c "ros2 launch duatic_simulation gazebo.launch.py world:=$${WORLD} headless:=$${HEADLESS:-false}"
+      image: ghcr.io/duatic/dev-workspace/dynaarm-jazzy
+      environment:
+        - DISPLAY=${DISPLAY}
+        - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+        - WORLD
+        - HEADLESS
+      network_mode: host
+      ipc: host
+      volumes:
+        - /tmp/.X11-unix:/tmp/.X11-unix
