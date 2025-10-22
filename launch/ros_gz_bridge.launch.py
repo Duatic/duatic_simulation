@@ -1,7 +1,7 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node, PushRosNamespace
+from launch_ros.actions import Node
 
 import tempfile
 
@@ -39,11 +39,10 @@ def launch_setup(context, *args, **kwargs):
 
     params_file = generate_bridge_params(namespace, world, config_file)
 
-    ros_gz_bridge = PushRosNamespace(namespace)
-
-    bridge_node = Node(
+    ros_gz_bridge = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
+        namespace=LaunchConfiguration("namespace"),
         arguments=[
             "--ros-args",
             "-p",
@@ -52,7 +51,7 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
     )
 
-    return [ros_gz_bridge, bridge_node]
+    return [ros_gz_bridge]
 
 
 def generate_launch_description():
