@@ -1,9 +1,8 @@
 # duatic_gazebo
-[![Humble](https://github.com/Duatic/duatic_gazebo/actions/workflows/build-humble.yml/badge.svg?branch=main)](https://github.com/Duatic/duatic_gazebo/actions/workflows/build-humble.yml)
-[![Jazzy](https://github.com/Duatic/duatic_gazebo/actions/workflows/build-jazzy.yml/badge.svg?branch=main)](https://github.com/Duatic/duatic_gazebo/actions/workflows/build-jazzy.yml)
-[![Kilted](https://github.com/Duatic/duatic_gazebo/actions/workflows/build-kilted.yml/badge.svg?branch=main)](https://github.com/Duatic/duatic_gazebo/actions/workflows/build-kilted.yml)
-[![Lyrical](https://github.com/Duatic/duatic_gazebo/actions/workflows/build-lyrical.yml/badge.svg?branch=main)](https://github.com/Duatic/duatic_gazebo/actions/workflows/build-lyrical.yml)
-[![Rolling](https://github.com/Duatic/duatic_gazebo/actions/workflows/build-rolling.yml/badge.svg?branch=main)](https://github.com/Duatic/duatic_gazebo/actions/workflows/build-rolling.yml)
+[![Jazzy](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mbloechli/3339b96a06290c449186f7fde2d3cc1a/raw/duatic_gazebo-jazzy.json)](https://github.com/Duatic/duatic_gazebo/actions/workflows/ci.yml)
+[![Kilted](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mbloechli/3339b96a06290c449186f7fde2d3cc1a/raw/duatic_gazebo-kilted.json)](https://github.com/Duatic/duatic_gazebo/actions/workflows/ci.yml)
+[![Lyrical](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mbloechli/3339b96a06290c449186f7fde2d3cc1a/raw/duatic_gazebo-lyrical.json)](https://github.com/Duatic/duatic_gazebo/actions/workflows/ci.yml)
+[![Rolling](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mbloechli/3339b96a06290c449186f7fde2d3cc1a/raw/duatic_gazebo-rolling.json)](https://github.com/Duatic/duatic_gazebo/actions/workflows/ci.yml)
 
 ## Overview
 
