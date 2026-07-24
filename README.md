@@ -130,6 +130,8 @@ ros2 run duatic_gazebo start_sim.py --ros-args -p world:=warehouse -p headless:=
 
 - **duatic_empty**: Minimal environment for basic testing
 - **warehouse**: AWS RoboMaker warehouse with shelves, pallets, and clutter
+- **bag_lifting**: Demo booth with an AprilTag wall, pallet, table, and rice
+  bags — used for dual-arm bag pick/place demos
 
 ## Assets
 
@@ -137,6 +139,10 @@ ros2 run duatic_gazebo start_sim.py --ros-args -p world:=warehouse -p headless:=
 - Warehouse infrastructure (shelves, walls, ground)
 - Props (buckets, lamps, trash cans, pallet jacks)
 - Clutter objects for realistic environments
+
+### Bag Lifting Demo Models
+- Demo booth and AprilTag wall (`booth`, `Apriltag16_05_00010`)
+- Pallet, table, and rice bag props (`pallet`, `table`, `bag`)
 
 
 # Contributing

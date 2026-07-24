@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<sdf version="1.11">
+  <world name="bag_lifting">
+
+    <physics name="2ms" type="Bullet">
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>500</real_time_update_rate>
+    </physics>
+
+    <!-- Plugins-->
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"></plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"></plugin>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"></plugin>
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"></plugin>
+
+    <!-- Sensor Plugins-->
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"></plugin>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- Demo booth -->
+    <include>
+      <uri>model://booth</uri>
+      <pose>0 2 0 0 0 0</pose>
+    </include>
+
+    <!-- Apriltag large wall -->
+    <include>
+      <uri>model://Apriltag16_05_00010</uri>
+      <pose>0 2 0.3 1.5707 -1.5707 0</pose>
+    </include>
+
+    <model name="ground_plane">
+      <static>true</static>
+        <link name="link">
+            <collision name="collision">
+                <geometry>
+                    <plane>
+                        <normal>0 0 1</normal>
+                    </plane>
+                </geometry>
+            </collision>
+        </link>
+    </model>
+
+    <model name="pallet">
+      <static>true</static>
+      <pose>1.3 0.4 0 0 3.14 0</pose>
+
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://pallet/pallet.glb</uri>
+              <scale>0.001 0.001 0.002</scale>
+            </mesh>
+          </geometry>
+        </visual>
+
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>model://pallet/pallet.glb</uri>
+              <scale>0.001 0.001 0.002</scale>
+            </mesh>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <model name="table">
+      <static>true</static>
+      <pose>-0.7 1.6 0.20 0 0 1.5708</pose>
+
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://table/table.dae</uri>
+              <scale>0.6 0.6 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>model://table/table.dae</uri>
+              <scale>0.6 0.6 1</scale>
+            </mesh>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <model name="bag">
+      <static>false</static>
+      <pose>1.1 0.5 0.38 1.5708 0 0</pose>
+
+      <link name="link">
+        <inertial>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.02</ixx> <iyy>0.02</iyy> <izz>0.02</izz>
+            <ixy>0</ixy> <ixz>0</ixz> <iyz>0</iyz>
+          </inertia>
+        </inertial>
+
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://bag/rice_bag.glb</uri>
+              <scale>0.5 0.75 0.75</scale>
+            </mesh>
+          </geometry>
+        </visual>
+
+        <!-- SIMPLE collision -->
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <model name="bag2">
+      <static>false</static>
+      <pose>-0.5 1.8 2.0 1.5708 0 1.5708</pose>
+
+      <link name="link">
+        <inertial>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.02</ixx> <iyy>0.02</iyy> <izz>0.02</izz>
+            <ixy>0</ixy> <ixz>0</ixz> <iyz>0</iyz>
+          </inertia>
+        </inertial>
+
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://bag/rice_bag.glb</uri>
+              <scale>0.4 0.5 0.75</scale>
+            </mesh>
+          </geometry>
+        </visual>
+
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- Lighting -->
+    <light name="light" type="point">
+      <pose>0 0 8.5 0 0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>80</range>
+        <constant>0.3</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>1</cast_shadows>
+      <direction>0.1 0.1 -1</direction>
+    </light>
+  </world>
+</sdf>
