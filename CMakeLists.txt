@@ -24,6 +24,7 @@ install(DIRECTORY
 # Install scripts as executables
 install(PROGRAMS
   scripts/start_sim.py
+  scripts/unpause_sim.py
   DESTINATION lib/${PROJECT_NAME}/
 )
 

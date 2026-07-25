@@ -23,6 +23,7 @@
   <test_depend>duatic_helpers</test_depend>
 
   <exec_depend>gz_ros2_control</exec_depend>
+  <exec_depend>controller_manager_msgs</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

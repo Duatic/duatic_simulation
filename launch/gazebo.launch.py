@@ -57,8 +57,12 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
-    # Launch Gazebo headless or with GUI
-    gz_args = [LaunchConfiguration("world"), ".sdf", " -r", " -v", LaunchConfiguration("log_level")]
+    # Launch Gazebo headless or with GUI. The world starts PAUSED (no -r):
+    # gravity acting before ros2_control claims the joints lets the arms fall
+    # limp and drag the hip over on slow starts. unpause_sim.py resumes
+    # physics once the hardware components in wait_hardware are active (or
+    # immediately if none are given).
+    gz_args = [LaunchConfiguration("world"), ".sdf", " -v", LaunchConfiguration("log_level")]
 
     gazebo = GroupAction(
         [
@@ -84,7 +88,22 @@ def launch_setup(context, *args, **kwargs):
         arguments=["/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock"],
     )
 
-    return [gz_resource_path, gazebo, clock_bridge]
+    # Unpause once the requested controllers are active (see gz_args comment)
+    unpause = Node(
+        package="duatic_gazebo",
+        executable="unpause_sim.py",
+        name="unpause_sim",
+        output="screen",
+        parameters=[
+            {
+                "world": LaunchConfiguration("world"),
+                "wait_hardware": LaunchConfiguration("wait_hardware"),
+                "timeout": 60.0,
+            }
+        ],
+    )
+
+    return [gz_resource_path, gazebo, clock_bridge, unpause]
 
 
 def generate_launch_description():
@@ -106,6 +125,15 @@ def generate_launch_description():
             "log_level",
             default_value="1",
             description="Gazebo log level(debug:4, info:3, warn:2, error:1, fatal:0)",
+        ),
+        DeclareLaunchArgument(
+            "wait_hardware",
+            default_value="",
+            description=(
+                "Comma-separated ros2_control hardware component names that must be "
+                "active before the paused simulation is resumed. Empty = unpause "
+                "immediately."
+            ),
         ),
     ]
 
