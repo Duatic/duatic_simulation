@@ -116,7 +116,7 @@
       </link>
     </model>
 
-    <!-- ==================== Pallet A: sort destination for WHITE bags (starts empty) ==================== -->
+    <!-- ==================== Pallet A: sort destination for RED bags (starts empty) ==================== -->
     <model name="pallet_a">
       <static>true</static>
       <pose>-3.5 2.5 0 0 3.14159 0</pose>
@@ -130,31 +130,20 @@
       </link>
     </model>
 
-    <!-- Mixed bags start stacked on the 3 tables; the app sorts them onto the pallets by colour. -->
-    <model name="bag_white_1">
-      <static>false</static>
-      <pose>-3.5 -2.5 0.85 1.5708 0 0</pose>
-      <link name="link">
-        <inertial>
-          <mass>1.0</mass>
-          <inertia><ixx>0.02</ixx><iyy>0.02</iyy><izz>0.02</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
-        </inertial>
-        <visual name="visual">
-          <geometry><mesh><uri>model://bag/rice_bag.glb</uri><scale>0.5 0.75 0.75</scale></mesh></geometry>
-          <material>
-            <ambient>0.9 0.9 0.9 1</ambient>
-            <diffuse>0.9 0.9 0.9 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
-        </collision>
-      </link>
-    </model>
+    <!-- Mixed bags start stacked on the 3 tables; the app sorts them onto the pallets by
+    colour. Both colours are saturated on purpose: SAM3 keys on prompts like
+    "red object" / "blue object", and a white bag would collide with the robot's
+    own white arms in the camera image.
 
-    <model name="bag_white_2">
+    The mesh is 0.40 x 0.15 x 0.75 m once scaled, with the long axis along the
+    model's z. The roll of pi/2 lays it flat, the yaw of pi/2 then turns it
+    across the robot's line of sight, so the two short ends face the two clamps
+    — the same dual-arm grasp as on the real cell. Without the yaw the long axis
+    points away from the robot and grasp_point_detection puts the two grasp
+    points above each other, which no pair of side-by-side arms can reach. -->
+    <model name="bag_red_1">
       <static>false</static>
-      <pose>0 -2.5 0.85 1.5708 0 0</pose>
+      <pose>-3.5 -2.5 0.85 1.5708 0 1.5708</pose>
       <link name="link">
         <inertial>
           <mass>1.0</mass>
@@ -163,19 +152,25 @@
         <visual name="visual">
           <geometry><mesh><uri>model://bag/rice_bag.glb</uri><scale>0.5 0.75 0.75</scale></mesh></geometry>
           <material>
-            <ambient>0.9 0.9 0.9 1</ambient>
-            <diffuse>0.9 0.9 0.9 1</diffuse>
+            <ambient>0.8 0.12 0.1 1</ambient>
+            <diffuse>0.8 0.12 0.1 1</diffuse>
+            <specular>0.2 0.1 0.1 1</specular>
           </material>
         </visual>
         <collision name="collision">
           <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
         </collision>
       </link>
-    </model>
+          <!-- Grasp fixture: the clamps can't hold this reliably by friction (the
+           collision box is far smaller than the visible mesh), so gripping
+           attaches the bag rigidly instead. gz-sim 8's DetachableJoint has no
+           <suppress_initial_attach>, but it stays detached here because the
+           robot model doesn't exist yet when the world loads. -->
+</model>
 
-    <model name="bag_white_3">
+    <model name="bag_red_2">
       <static>false</static>
-      <pose>3.5 -2.5 0.85 1.5708 0 0</pose>
+      <pose>0 -2.5 0.85 1.5708 0 1.5708</pose>
       <link name="link">
         <inertial>
           <mass>1.0</mass>
@@ -184,15 +179,48 @@
         <visual name="visual">
           <geometry><mesh><uri>model://bag/rice_bag.glb</uri><scale>0.5 0.75 0.75</scale></mesh></geometry>
           <material>
-            <ambient>0.9 0.9 0.9 1</ambient>
-            <diffuse>0.9 0.9 0.9 1</diffuse>
+            <ambient>0.8 0.12 0.1 1</ambient>
+            <diffuse>0.8 0.12 0.1 1</diffuse>
+            <specular>0.2 0.1 0.1 1</specular>
           </material>
         </visual>
         <collision name="collision">
           <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
         </collision>
       </link>
-    </model>
+          <!-- Grasp fixture: the clamps can't hold this reliably by friction (the
+           collision box is far smaller than the visible mesh), so gripping
+           attaches the bag rigidly instead. gz-sim 8's DetachableJoint has no
+           <suppress_initial_attach>, but it stays detached here because the
+           robot model doesn't exist yet when the world loads. -->
+</model>
+
+    <model name="bag_red_3">
+      <static>false</static>
+      <pose>3.5 -2.5 0.85 1.5708 0 1.5708</pose>
+      <link name="link">
+        <inertial>
+          <mass>1.0</mass>
+          <inertia><ixx>0.02</ixx><iyy>0.02</iyy><izz>0.02</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry><mesh><uri>model://bag/rice_bag.glb</uri><scale>0.5 0.75 0.75</scale></mesh></geometry>
+          <material>
+            <ambient>0.8 0.12 0.1 1</ambient>
+            <diffuse>0.8 0.12 0.1 1</diffuse>
+            <specular>0.2 0.1 0.1 1</specular>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
+        </collision>
+      </link>
+          <!-- Grasp fixture: the clamps can't hold this reliably by friction (the
+           collision box is far smaller than the visible mesh), so gripping
+           attaches the bag rigidly instead. gz-sim 8's DetachableJoint has no
+           <suppress_initial_attach>, but it stays detached here because the
+           robot model doesn't exist yet when the world loads. -->
+</model>
 
     <!-- ==================== Pallet B: sort destination for BLUE bags (starts empty) ==================== -->
     <model name="pallet_b">
@@ -210,7 +238,7 @@
 
     <model name="bag_blue_1">
       <static>false</static>
-      <pose>-3.5 -2.5 0.96 1.5708 0 0</pose>
+      <pose>-3.5 -2.5 0.96 1.5708 0 1.5708</pose>
       <link name="link">
         <inertial>
           <mass>1.0</mass>
@@ -221,17 +249,23 @@
           <material>
             <ambient>0.1 0.2 0.9 1</ambient>
             <diffuse>0.1 0.2 0.9 1</diffuse>
+            <specular>0.1 0.1 0.2 1</specular>
           </material>
         </visual>
         <collision name="collision">
           <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
         </collision>
       </link>
-    </model>
+          <!-- Grasp fixture: the clamps can't hold this reliably by friction (the
+           collision box is far smaller than the visible mesh), so gripping
+           attaches the bag rigidly instead. gz-sim 8's DetachableJoint has no
+           <suppress_initial_attach>, but it stays detached here because the
+           robot model doesn't exist yet when the world loads. -->
+</model>
 
     <model name="bag_blue_2">
       <static>false</static>
-      <pose>0 -2.5 0.96 1.5708 0 0</pose>
+      <pose>0 -2.5 0.96 1.5708 0 1.5708</pose>
       <link name="link">
         <inertial>
           <mass>1.0</mass>
@@ -242,17 +276,18 @@
           <material>
             <ambient>0.1 0.2 0.9 1</ambient>
             <diffuse>0.1 0.2 0.9 1</diffuse>
+            <specular>0.1 0.1 0.2 1</specular>
           </material>
         </visual>
         <collision name="collision">
           <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
         </collision>
       </link>
-    </model>
+</model>
 
     <model name="bag_blue_3">
       <static>false</static>
-      <pose>3.5 -2.5 0.96 1.5708 0 0</pose>
+      <pose>3.5 -2.5 0.96 1.5708 0 1.5708</pose>
       <link name="link">
         <inertial>
           <mass>1.0</mass>
@@ -263,13 +298,19 @@
           <material>
             <ambient>0.1 0.2 0.9 1</ambient>
             <diffuse>0.1 0.2 0.9 1</diffuse>
+            <specular>0.1 0.1 0.2 1</specular>
           </material>
         </visual>
         <collision name="collision">
           <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
         </collision>
       </link>
-    </model>
+          <!-- Grasp fixture: the clamps can't hold this reliably by friction (the
+           collision box is far smaller than the visible mesh), so gripping
+           attaches the bag rigidly instead. gz-sim 8's DetachableJoint has no
+           <suppress_initial_attach>, but it stays detached here because the
+           robot model doesn't exist yet when the world loads. -->
+</model>
 
     <!-- ==================== Tables ==================== -->
     <!-- Table 1: destination for white bags -->
