@@ -1,0 +1,284 @@
+<?xml version="1.0"?>
+<sdf version="1.11">
+  <world name="bag_sorting_single">
+
+    <physics name="2ms" type="Bullet">
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>500</real_time_update_rate>
+    </physics>
+
+    <!-- Plugins-->
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"></plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"></plugin>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"></plugin>
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"></plugin>
+
+    <!-- Sensor Plugins-->
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"></plugin>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- Floor: 10.4m x 8.4m (10m x 8m interior + wall thickness) -->
+    <model name="floor">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>10.4 8.4</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.55 0.55 0.55 1</ambient>
+            <diffuse>0.55 0.55 0.55 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Walls: 10m (x) x 8m (y) interior, 3m tall, 0.2m thick -->
+    <model name="wall_north">
+      <static>true</static>
+      <pose>0 4.1 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>10.4 0.2 3.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>10.4 0.2 3.0</size></box></geometry>
+          <material>
+            <ambient>0.85 0.85 0.85 1</ambient>
+            <diffuse>0.85 0.85 0.85 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="wall_south">
+      <static>true</static>
+      <pose>0 -4.1 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>10.4 0.2 3.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>10.4 0.2 3.0</size></box></geometry>
+          <material>
+            <ambient>0.85 0.85 0.85 1</ambient>
+            <diffuse>0.85 0.85 0.85 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="wall_east">
+      <static>true</static>
+      <pose>5.1 0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.2 8.4 3.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.2 8.4 3.0</size></box></geometry>
+          <material>
+            <ambient>0.85 0.85 0.85 1</ambient>
+            <diffuse>0.85 0.85 0.85 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="wall_west">
+      <static>true</static>
+      <pose>-5.1 0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.2 8.4 3.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.2 8.4 3.0</size></box></geometry>
+          <material>
+            <ambient>0.85 0.85 0.85 1</ambient>
+            <diffuse>0.85 0.85 0.85 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ==================== Pallet A: sort destination for RED bags (starts empty) ==================== -->
+    <model name="pallet_a">
+      <static>true</static>
+      <pose>-3.5 2.5 0 0 3.14159 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh><uri>model://pallet/pallet.glb</uri><scale>0.001 0.001 0.002</scale></mesh></geometry>
+        </visual>
+        <collision name="collision">
+          <geometry><mesh><uri>model://pallet/pallet.glb</uri><scale>0.001 0.001 0.002</scale></mesh></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- Mixed bags start stacked on the 3 tables; the app sorts them onto the pallets by
+    colour. Both colours are saturated on purpose: SAM3 keys on prompts like
+    "red object" / "blue object", and a white bag would collide with the robot's
+    own white arms in the camera image.
+
+    The mesh is 0.40 x 0.15 x 0.75 m once scaled, with the long axis along the
+    model's z. The roll of pi/2 lays it flat, the yaw of pi/2 then turns it
+    across the robot's line of sight, so the two short ends face the two clamps
+    — the same dual-arm grasp as on the real cell. Without the yaw the long axis
+    points away from the robot and grasp_point_detection puts the two grasp
+    points above each other, which no pair of side-by-side arms can reach. -->
+
+
+
+    <!-- ==================== Pallet B: sort destination for BLUE bags (starts empty) ==================== -->
+    <model name="pallet_b">
+      <static>true</static>
+      <pose>3.5 2.5 0 0 3.14159 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh><uri>model://pallet/pallet.glb</uri><scale>0.001 0.001 0.002</scale></mesh></geometry>
+        </visual>
+        <collision name="collision">
+          <geometry><mesh><uri>model://pallet/pallet.glb</uri><scale>0.001 0.001 0.002</scale></mesh></geometry>
+        </collision>
+      </link>
+    </model>
+
+
+
+
+    <!-- Exactly one bag, on the middle table's front edge where the demo expects
+    it. A world per scenario beats clearing bags at runtime: with the bag already
+    in place, a fresh simulation IS the reset. Removing or teleporting bags in a
+    running world was the single largest source of confusing failures — teleported
+    onto another bag it reads as a stack, the grasp points come out wrong (span
+    0.60 instead of 0.72 m), and the blame lands on whatever code changed last.
+    bag_sorting.sdf keeps the full six-bag colour-sorting scenario. -->
+    <model name="bag_blue_2">
+      <static>false</static>
+      <pose>0 -2.36 0.85 1.5708 0 1.5708</pose>
+      <link name="link">
+        <inertial>
+          <!-- 0.2 kg, not the 20 kg of a real sack and not even 1 kg. The arms
+               in this simulation are position-commanded through gz_ros2_control
+               and are statically compliant: measured, 1 kg on the clamps left the
+               left elbow 0.106 rad short of its commanded value once the load hung
+               on it, against a 0.05 rad goal tolerance, so the controller aborted
+               a motion that was otherwise on target to a millimetre. Joint torque
+               is not the limit — the arm joints allow 40 Nm and the load asks for
+               about 9. The proper fix is the GravityCompensationController that
+               already exists in duatic_controllers, feeding the effort interface
+               alongside the position JTC; until that is set up for simulation, the
+               load is kept light so the compliance does not dominate. Nothing
+               about grasp forces is being validated here. -->
+          <mass>0.2</mass>
+          <inertia><ixx>0.02</ixx><iyy>0.02</iyy><izz>0.02</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry><mesh><uri>model://bag/rice_bag.glb</uri><scale>0.5 0.75 0.75</scale></mesh></geometry>
+          <material>
+            <ambient>0.1 0.2 0.9 1</ambient>
+            <diffuse>0.1 0.2 0.9 1</diffuse>
+            <specular>0.1 0.1 0.2 1</specular>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
+        </collision>
+      </link>
+</model>
+
+    <!-- ==================== Tables ==================== -->
+    <!-- Table 1: destination for white bags -->
+    <model name="table_1">
+      <static>true</static>
+      <pose>-3.5 -2.5 0.20 0 0 1.5708</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh><uri>model://table/table.dae</uri><scale>0.6 0.6 1</scale></mesh></geometry>
+        </visual>
+        <collision name="collision">
+          <geometry><mesh><uri>model://table/table.dae</uri><scale>0.6 0.6 1</scale></mesh></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- Table 2: destination for blue bags -->
+    <model name="table_2">
+      <static>true</static>
+      <pose>3.5 -2.5 0.20 0 0 1.5708</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh><uri>model://table/table.dae</uri><scale>0.6 0.6 1</scale></mesh></geometry>
+        </visual>
+        <collision name="collision">
+          <geometry><mesh><uri>model://table/table.dae</uri><scale>0.6 0.6 1</scale></mesh></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- Table 3: spare / staging, no assigned bag color -->
+    <model name="table_3">
+      <static>true</static>
+      <pose>0 -2.5 0.20 0 0 1.5708</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh><uri>model://table/table.dae</uri><scale>0.6 0.6 1</scale></mesh></geometry>
+        </visual>
+        <collision name="collision">
+          <geometry><mesh><uri>model://table/table.dae</uri><scale>0.6 0.6 1</scale></mesh></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- Lighting -->
+    <light name="sun" type="directional">
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.3 0.3 -0.9</direction>
+      <cast_shadows>true</cast_shadows>
+    </light>
+
+    <light name="light_pallets" type="point">
+      <pose>0 2.5 6 0 0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>15</range>
+        <constant>0.3</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>false</cast_shadows>
+    </light>
+
+    <light name="light_tables" type="point">
+      <pose>0 -2.5 6 0 0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>15</range>
+        <constant>0.3</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>false</cast_shadows>
+    </light>
+
+  </world>
+</sdf>
