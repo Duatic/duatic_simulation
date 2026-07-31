@@ -2,7 +2,9 @@
 <sdf version="1.11">
   <world name="bag_sorting_single">
 
-    <!-- 4 ms, not 2: real-time factor 0.78 instead of 0.48. Revert if the bag jitters. -->
+    <!-- Sized for a real-time factor near 0.8, so motions take roughly their commanded
+         duration; a smaller step costs speed proportionally. Increase it back if the bag
+         starts jittering or creeping on the deck. -->
     <physics name="4ms" type="Bullet">
       <max_step_size>0.004</max_step_size>
       <real_time_factor>1.0</real_time_factor>
@@ -174,11 +176,11 @@
       <pose>0 -2.36 0.85 1.5708 0 1.5708</pose>
       <link name="link">
         <inertial>
-          <!-- 0.2 kg, not the 20 kg of a real sack and not even 1 kg. The arms are
-               position-commanded through gz_ros2_control and statically compliant: at
-               1 kg the left elbow sat 0.106 rad short of its command against a 0.05 rad
-               goal tolerance, so the controller aborted a motion otherwise on target to
-               a millimetre. Torque is not the limit — 40 Nm available, about 9 asked.
+          <!-- Far below a real sack's 20 kg, deliberately. The arms are position-
+               commanded through gz_ros2_control and statically compliant: at 1 kg the
+               left elbow sits 0.106 rad short of its command against a 0.05 rad goal
+               tolerance, so the controller aborts a motion otherwise on target to a
+               millimetre. Torque is not the limit — 40 Nm available, about 9 asked.
                The proper fix is the GravityCompensationController in duatic_controllers,
                feeding the effort interface alongside the position JTC; until that is set
                up for simulation the load stays light. Nothing about grasp forces is
