@@ -2,10 +2,11 @@
 <sdf version="1.11">
   <world name="bag_sorting_single">
 
-    <physics name="2ms" type="Bullet">
-      <max_step_size>0.002</max_step_size>
+    <!-- 4 ms, not 2: real-time factor 0.78 instead of 0.48. Revert if the bag jitters. -->
+    <physics name="4ms" type="Bullet">
+      <max_step_size>0.004</max_step_size>
       <real_time_factor>1.0</real_time_factor>
-      <real_time_update_rate>500</real_time_update_rate>
+      <real_time_update_rate>250</real_time_update_rate>
     </physics>
 
     <!-- Plugins-->
