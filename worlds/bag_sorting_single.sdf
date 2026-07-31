@@ -174,18 +174,15 @@
       <pose>0 -2.36 0.85 1.5708 0 1.5708</pose>
       <link name="link">
         <inertial>
-          <!-- 0.2 kg, not the 20 kg of a real sack and not even 1 kg. The arms
-               in this simulation are position-commanded through gz_ros2_control
-               and are statically compliant: measured, 1 kg on the clamps left the
-               left elbow 0.106 rad short of its commanded value once the load hung
-               on it, against a 0.05 rad goal tolerance, so the controller aborted
-               a motion that was otherwise on target to a millimetre. Joint torque
-               is not the limit — the arm joints allow 40 Nm and the load asks for
-               about 9. The proper fix is the GravityCompensationController that
-               already exists in duatic_controllers, feeding the effort interface
-               alongside the position JTC; until that is set up for simulation, the
-               load is kept light so the compliance does not dominate. Nothing
-               about grasp forces is being validated here. -->
+          <!-- 0.2 kg, not the 20 kg of a real sack and not even 1 kg. The arms are
+               position-commanded through gz_ros2_control and statically compliant: at
+               1 kg the left elbow sat 0.106 rad short of its command against a 0.05 rad
+               goal tolerance, so the controller aborted a motion otherwise on target to
+               a millimetre. Torque is not the limit — 40 Nm available, about 9 asked.
+               The proper fix is the GravityCompensationController in duatic_controllers,
+               feeding the effort interface alongside the position JTC; until that is set
+               up for simulation the load stays light. Nothing about grasp forces is
+               being validated here. -->
           <mass>0.2</mass>
           <inertia><ixx>0.02</ixx><iyy>0.02</iyy><izz>0.02</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
         </inertial>

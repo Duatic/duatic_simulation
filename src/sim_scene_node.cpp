@@ -14,6 +14,11 @@
 // human-readable output. Everything needed is already available through the ROS
 // vendor packages — gz-transport13 and gz-msgs10, including entity_plugin_v.
 //
+// Welding only — no levelling, deliberately. "Level" cannot be written generically:
+// zeroing roll and pitch is what it means for most models, but a mesh whose long axis
+// runs along local z needs a 90 degree roll to lie down at all, and zeroing it stands
+// the object on its end. Only the caller knows its model's convention.
+//
 // Simulation only. Nothing above this should depend on it, or that thing will not run
 // on hardware; the /sim namespace is meant to make that obvious at a glance, and there
 // is deliberately no skill descriptor so the UI never offers it as a building block.
@@ -120,10 +125,9 @@ private:
 
     // One parent joint per body. A second live coupling is not a second constraint but
     // a closed loop — base_link -> load -> gripper -> arm -> base_link — which the
-    // physics engine resolves by having the two ends fight each other. Measured once:
-    // an elbow ended 1.0252 rad from its command and the controller aborted. Refused
-    // rather than warned, because the caller cannot see the consequence and the fix is
-    // always the same: release the other coupling first.
+    // physics engine resolves by having the two ends fight, so a joint ends far from its
+    // command and the controller aborts. Refused rather than warned: the caller cannot
+    // see that consequence, and the remedy is always to release the other coupling.
     for (const auto & [other_tag, models] : live_) {
       if (other_tag != tag && models.count(child)) {
         res->success = false;
@@ -182,9 +186,9 @@ private:
     }
 
     // The plugin goes on the HOLDER, whose link is <parent_link>. The child model is
-    // the dependent body: its pose is resolved through the joint. Hosting this on the
-    // load instead makes the holder follow the load — measured, lifting a 0.2 kg bag
-    // moved the whole rover 0.65 m.
+    // the dependent body: its pose is resolved through the joint. Hosting it on the load
+    // instead inverts that — commanding the load then moves the holder, however heavy
+    // the holder and however light the load.
     const std::string inner =
       "<parent_link>" + holder_link + "</parent_link>" +
       "<child_model>" + child + "</child_model>" +
@@ -270,10 +274,9 @@ private:
   //
   // Advertising and publishing in the same breath loses the message: gz-transport needs
   // a moment to wire publisher to subscriber, and until it has, Publish() succeeds while
-  // nothing receives it. That cost a run — a detach reported success, the load stayed
-  // welded to the clamp, and the next attach then closed the very kinematic loop this
-  // node exists to prevent. The publishers are also cached, because re-advertising the
-  // same topic starts the race over.
+  // nothing receives it — so a detach reports success while the load stays welded, and
+  // the next attach closes the very loop this node exists to prevent. Publishers are
+  // cached because re-advertising the same topic starts the race over.
   bool publishOn(const std::string & topic)
   {
     auto it = pubs_.find(topic);
