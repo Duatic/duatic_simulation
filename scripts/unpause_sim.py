@@ -94,9 +94,7 @@ class UnpauseSim(Node):
             rclpy.spin_until_future_complete(self, future, timeout_sec=poll_interval * 4)
             response = future.result()
             if response is not None:
-                active = {
-                    c.name for c in response.component if c.state.label == "active"
-                }
+                active = {c.name for c in response.component if c.state.label == "active"}
                 missing = wanted - active
                 if not missing:
                     self.get_logger().info("All required hardware components active")
