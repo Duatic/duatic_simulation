@@ -28,6 +28,7 @@ install(TARGETS sim_scene_node DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY
   launch
   worlds
+  maps
   models
   docker
   urdf
