@@ -138,17 +138,16 @@ private:
       }
     }
 
-    // Already injected for this pair: the joint is still there, so re-welding is just
-    // a message on its attach topic.
-    if (injected_[tag].count(child)) {
-      if (!publishOn(attachTopic(tag, child))) {
-        res->success = false;
-        res->message = "Could not publish on " + attachTopic(tag, child);
-        return;
-      }
-      live_[tag].insert(child);
+    // Already closed under this tag: nothing to do. Anything else gets a FRESH joint,
+    // even for a pair that was welded before. A DetachableJoint that has been detached
+    // does not weld again when its attach topic is published on: the message goes out,
+    // gz-transport still reports a listener, and the load simply stays where it is. So
+    // every attach injects its own plugin instance, which is the path that demonstrably
+    // works, and each instance gets its own topics via a per-pair counter.
+    if (live_[tag].count(child)) {
       res->success = true;
-      res->message = "'" + child + "' re-attached as '" + tag + "'";
+      res->message = "'" + child + "' is already held as '" + tag + "'";
+      RCLCPP_INFO(get_logger(), "%s", res->message.c_str());
       return;
     }
 
@@ -189,6 +188,12 @@ private:
     // the dependent body: its pose is resolved through the joint. Hosting it on the load
     // instead inverts that — commanding the load then moves the holder, however heavy
     // the holder and however light the load.
+    // A new instance, so a new pair of topics. The first attach of a pair is instance 0.
+    auto & n = instance_[tag + "/" + child];
+    if (injected_[tag].count(child)) {
+      ++n;
+    }
+
     const std::string inner =
       "<parent_link>" + holder_link + "</parent_link>" +
       "<child_model>" + child + "</child_model>" +
@@ -298,24 +303,34 @@ private:
     return it->second.Publish(msg);
   }
 
+  // One topic pair per injected instance. Reusing a topic would address the previous,
+  // already detached joint, which no longer welds.
+  std::string instanceBase(const std::string & tag, const std::string & child) const
+  {
+    auto it = instance_.find(tag + "/" + child);
+    const int n = it == instance_.end() ? 0 : it->second;
+    return "/sim/" + tag + "/" + child + "/" + std::to_string(n);
+  }
   std::string attachTopic(const std::string & tag, const std::string & child) const
   {
-    return "/sim/" + tag + "/" + child + "/attach";
+    return instanceBase(tag, child) + "/attach";
   }
   std::string detachTopic(const std::string & tag, const std::string & child) const
   {
-    return "/sim/" + tag + "/" + child + "/detach";
+    return instanceBase(tag, child) + "/detach";
   }
 
   std::string world_;
   std::string robot_;
   gz::transport::Node gz_;
-  // Injected: the joint exists in Gazebo, so re-welding needs only the attach topic.
-  // Live: it is currently closed. Only the live set can answer "does this body already
-  // have a parent", and the two differ because a detached joint stays injected.
+  // Injected: a joint for this pair has been created at least once, which is what makes
+  // the next attach a new instance rather than the first. Live: one is currently closed —
+  // only that set can answer "does this body already have a parent".
   std::map<std::string, gz::transport::Node::Publisher> pubs_;
   std::map<std::string, std::set<std::string>> injected_;
   std::map<std::string, std::set<std::string>> live_;
+  // tag/child -> index of the joint instance currently injected for that pair.
+  std::map<std::string, int> instance_;
   rclcpp::Service<duatic_helper_msgs::srv::AttachModel>::SharedPtr attach_srv_;
   rclcpp::Service<duatic_helper_msgs::srv::DetachModel>::SharedPtr detach_srv_;
 };
