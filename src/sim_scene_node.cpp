@@ -28,6 +28,7 @@
 #include <set>
 #include <chrono>
 #include <thread>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -35,6 +36,7 @@
 #include <gz/msgs/empty.pb.h>
 #include <gz/msgs/entity_plugin_v.pb.h>
 #include <gz/msgs/scene.pb.h>
+#include <gz/msgs/stringmsg.pb.h>
 #include <gz/transport/Node.hh>
 
 #include <rclcpp/rclcpp.hpp>
@@ -44,6 +46,8 @@
 
 namespace
 {
+constexpr int kDetachAttempts = 3;
+constexpr int kDetachWaitTicks = 25;  // x 20 ms
 constexpr char kDetachableJointName[] = "gz::sim::systems::DetachableJoint";
 constexpr char kDetachableJointFile[] = "gz-sim-detachable-joint-system";
 // Gazebo's own services answer in well under a second; this is only a backstop so a
@@ -221,7 +225,12 @@ private:
       return;
     }
 
-    // Adding the system attaches it straight away.
+    // Adding the system attaches it straight away. Recorded here rather than waited for:
+    // the state topic is shared by every instance of a pair, so a detach that arrives before
+    // this attach's own "attached" would otherwise read the PREVIOUS cycle's "detached" and
+    // confirm a release that never happened.
+    watchState(tag, child);
+    setState(stateTopic(tag, child), "attached");
     injected_[tag].insert(child);
     live_[tag].insert(child);
     res->success = true;
@@ -259,19 +268,60 @@ private:
       return;
     }
 
+    std::vector<std::string> stuck;
     for (const auto & tag : tags) {
-      // live_ is only cleared when the message actually went out. Clearing it on a
-      // lost detach is what blinded the loop check.
-      if (publishOn(detachTopic(tag, child))) {
+      // live_ is only cleared when the joint is actually gone. Clearing it on a lost detach
+      // is what blinded the loop check.
+      if (detachAndConfirm(tag, child)) {
         live_[tag].erase(child);
         res->released.push_back(tag);
+      } else {
+        stuck.push_back(tag);
       }
     }
-    res->success = !res->released.empty();
-    res->message = res->success
-                     ? "'" + child + "' released"
-                     : "Could not publish a detach for '" + child + "'";
+    res->success = stuck.empty() && !res->released.empty();
+    if (!stuck.empty()) {
+      res->message = "'" + child + "' is still held as '" + stuck.front() +
+                     "': the joint did not report itself detached";
+    } else {
+      res->message = res->success
+                       ? "'" + child + "' released"
+                       : "Could not publish a detach for '" + child + "'";
+    }
     RCLCPP_INFO(get_logger(), "%s", res->message.c_str());
+  }
+
+  /** Detach, and do not report it until the plugin says it happened.
+   *
+   * Publishing was treated as detaching, and it is not the same thing: a run reported every
+   * release as successful while an arm stayed welded to its load, and the next attach was
+   * refused as a loop that in truth was not there. The plugin reports "detached" on its
+   * output topic, so ask it, and say so plainly when it does not answer.
+   */
+  bool detachAndConfirm(const std::string & tag, const std::string & child)
+  {
+    watchState(tag, child);
+    const std::string topic = stateTopic(tag, child);
+    for (int attempt = 0; attempt < kDetachAttempts; ++attempt) {
+      if (!publishOn(detachTopic(tag, child))) {
+        return false;
+      }
+      for (int i = 0; i < kDetachWaitTicks; ++i) {
+        if (lastState(topic) == "detached") {
+          if (attempt > 0) {
+            RCLCPP_WARN(
+              get_logger(), "'%s' needed %d detach attempts as '%s'", child.c_str(),
+              attempt + 1, tag.c_str());
+          }
+          return true;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+      }
+    }
+    RCLCPP_ERROR(
+      get_logger(), "'%s' did not report itself detached as '%s' after %d attempts",
+      child.c_str(), tag.c_str(), kDetachAttempts);
+    return false;
   }
 
   // Publish on an attach/detach topic, keeping the publisher alive and waiting for the
@@ -315,6 +365,12 @@ private:
   {
     return instanceBase(tag, child) + "/attach";
   }
+  /** Shared by every instance of a pair: the plugin reports the state, not which plugin. */
+  std::string stateTopic(const std::string & tag, const std::string & child) const
+  {
+    return "/sim/" + tag + "/" + child + "/state";
+  }
+
   std::string detachTopic(const std::string & tag, const std::string & child) const
   {
     return instanceBase(tag, child) + "/detach";
@@ -322,6 +378,34 @@ private:
 
   std::string world_;
   std::string robot_;
+  /** What the plugin last said about a pair, from its <output_topic>: "attached" or
+   *  "detached". The only account of the joint that does not come from our own bookkeeping. */
+  std::string lastState(const std::string & topic)
+  {
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    auto it = state_.find(topic);
+    return it == state_.end() ? std::string{} : it->second;
+  }
+
+  void setState(const std::string & topic, const std::string & value)
+  {
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    state_[topic] = value;
+  }
+
+  void watchState(const std::string & tag, const std::string & child)
+  {
+    const std::string topic = stateTopic(tag, child);
+    if (!watched_.insert(topic).second) {
+      return;
+    }
+    gz_.Subscribe<gz::msgs::StringMsg>(
+      topic, [this, topic](const gz::msgs::StringMsg & msg) {
+        std::lock_guard<std::mutex> lock(state_mutex_);
+        state_[topic] = msg.data();
+      });
+  }
+
   gz::transport::Node gz_;
   // Injected: a joint for this pair has been created at least once, which is what makes
   // the next attach a new instance rather than the first. Live: one is currently closed —
@@ -331,6 +415,9 @@ private:
   std::map<std::string, std::set<std::string>> live_;
   // tag/child -> index of the joint instance currently injected for that pair.
   std::map<std::string, int> instance_;
+  std::set<std::string> watched_;
+  std::map<std::string, std::string> state_;
+  std::mutex state_mutex_;
   rclcpp::Service<duatic_helper_msgs::srv::AttachModel>::SharedPtr attach_srv_;
   rclcpp::Service<duatic_helper_msgs::srv::DetachModel>::SharedPtr detach_srv_;
 };
