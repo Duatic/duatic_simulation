@@ -270,8 +270,7 @@ private:
 
     std::vector<std::string> stuck;
     for (const auto & tag : tags) {
-      // live_ is only cleared when the joint is actually gone. Clearing it on a lost detach
-      // is what blinded the loop check.
+      // live_ is only cleared when the joint is actually gone.
       if (detachAndConfirm(tag, child)) {
         live_[tag].erase(child);
         res->released.push_back(tag);
@@ -293,10 +292,8 @@ private:
 
   /** Detach, and do not report it until the plugin says it happened.
    *
-   * Publishing was treated as detaching, and it is not the same thing: a run reported every
-   * release as successful while an arm stayed welded to its load, and the next attach was
-   * refused as a loop that in truth was not there. The plugin reports "detached" on its
-   * output topic, so ask it, and say so plainly when it does not answer.
+   * The plugin reports "detached" on its output topic. Publishing on the detach topic only
+   * says the request went out, so the answer is what a release is confirmed by.
    */
   bool detachAndConfirm(const std::string & tag, const std::string & child)
   {

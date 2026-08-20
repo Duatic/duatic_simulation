@@ -2,9 +2,9 @@
 <sdf version="1.11">
   <world name="bag_sorting_single">
 
-    <!-- Sized for a real-time factor near 0.8, so motions take roughly their commanded
-         duration; a smaller step costs speed proportionally. Increase it back if the bag
-         starts jittering or creeping on the deck. -->
+    <!-- Asking for 1.0; a 4 ms step reaches about 0.8 on this hardware, which is close
+         enough that motions take roughly their commanded duration. Increase the step if
+         the bag starts jittering or creeping on the deck. -->
     <physics name="4ms" type="Bullet">
       <max_step_size>0.004</max_step_size>
       <real_time_factor>1.0</real_time_factor>
@@ -137,13 +137,7 @@
     colour. Both colours are saturated on purpose: SAM3 keys on prompts like
     "red object" / "blue object", and a white bag would collide with the robot's
     own white arms in the camera image.
-
-    The mesh is 0.40 x 0.15 x 0.75 m once scaled, with the long axis along the
-    model's z. The roll of pi/2 lays it flat, the yaw of pi/2 then turns it
-    across the robot's line of sight, so the two short ends face the two clamps
-    — the same dual-arm grasp as on the real cell. Without the yaw the long axis
-    points away from the robot and grasp_point_detection puts the two grasp
-    points above each other, which no pair of side-by-side arms can reach. -->
+ -->
 
 
 
@@ -164,13 +158,7 @@
 
 
 
-    <!-- Exactly one bag, on the middle table's front edge where the demo expects
-    it. A world per scenario beats clearing bags at runtime: with the bag already
-    in place, a fresh simulation IS the reset. Removing or teleporting bags in a
-    running world was the single largest source of confusing failures — teleported
-    onto another bag it reads as a stack, the grasp points come out wrong (span
-    0.60 instead of 0.72 m), and the blame lands on whatever code changed last.
-    bag_sorting.sdf keeps the full six-bag colour-sorting scenario. -->
+    <!-- Exactly one bag, on the middle table's front edge where the demo expects it. -->
     <model name="bag_blue_2">
       <static>false</static>
       <pose>0 -2.36 0.85 1.5708 0 1.5708</pose>

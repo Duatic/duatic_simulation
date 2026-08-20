@@ -130,8 +130,15 @@ ros2 run duatic_gazebo start_sim.py --ros-args -p world:=warehouse -p headless:=
 
 - **duatic_empty**: Minimal environment for basic testing
 - **warehouse**: AWS RoboMaker warehouse with shelves, pallets, and clutter
-- **bag_lifting**: Demo booth with an AprilTag wall, pallet, table, and rice
-  bags — used for dual-arm bag pick/place demos
+- **bag_lifting**: Demo booth with a wall, pallet, table, and rice bags, used for pick/place demos
+- **bag_sorting**: Six bags on three tables, sorted onto two pallets by colour
+- **bag_sorting_single**: One bag on the middle table, for the pick/place demo
+
+A world per scenario beats clearing objects at runtime: with the objects already in place,
+a fresh simulation is the reset. Occupancy maps live in `maps/`, one pair per world under
+the same basename, and are derived from the world geometry, so move a wall in the `.sdf`
+and the map is silently wrong. Maps recorded at a real site are instance data and live in
+`/srv/duatic/maps`.
 
 ## Assets
 
@@ -141,7 +148,7 @@ ros2 run duatic_gazebo start_sim.py --ros-args -p world:=warehouse -p headless:=
 - Clutter objects for realistic environments
 
 ### Bag Lifting Demo Models
-- Demo booth and AprilTag wall (`booth`, `Apriltag16_05_00010`)
+- Demo booth (`booth`)
 - Pallet, table, and rice bag props (`pallet`, `table`, `bag`)
 
 

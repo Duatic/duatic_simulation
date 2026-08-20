@@ -21,6 +21,7 @@
 # HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+
 """Unpause Gazebo once the robot's controllers are up.
 
 gazebo.launch.py starts the simulation paused so gravity cannot act on the
@@ -41,7 +42,7 @@ paused. Controller spawners, however, run on sim time — they stall until
 physics runs, so gating the unpause on *controller* activation would
 deadlock. The remaining window between unpause and the trajectory
 controllers claiming the joints is covered by the controller_manager's
-``hold_joints`` parameter (see duatic_control's controller_manager.yaml).
+``hold_joints`` parameter.
 """
 
 import subprocess
@@ -59,7 +60,7 @@ class UnpauseSim(Node):
         super().__init__("unpause_sim")
         self.declare_parameter("world", "empty")
         self.declare_parameter("wait_hardware", "")
-        self.declare_parameter("controller_manager", "/controller_manager")
+        self.declare_parameter("controller_manager", "controller_manager")
         self.declare_parameter("timeout", 60.0)
         self.declare_parameter("poll_interval", 0.5)
 

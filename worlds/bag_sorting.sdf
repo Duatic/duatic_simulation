@@ -134,13 +134,7 @@
     colour. Both colours are saturated on purpose: SAM3 keys on prompts like
     "red object" / "blue object", and a white bag would collide with the robot's
     own white arms in the camera image.
-
-    The mesh is 0.40 x 0.15 x 0.75 m once scaled, with the long axis along the
-    model's z. The roll of pi/2 lays it flat, the yaw of pi/2 then turns it
-    across the robot's line of sight, so the two short ends face the two clamps
-    — the same dual-arm grasp as on the real cell. Without the yaw the long axis
-    points away from the robot and grasp_point_detection puts the two grasp
-    points above each other, which no pair of side-by-side arms can reach. -->
+ -->
     <model name="bag_red_1">
       <static>false</static>
       <pose>-3.5 -2.5 0.85 1.5708 0 1.5708</pose>
@@ -188,11 +182,6 @@
           <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
         </collision>
       </link>
-          <!-- Grasp fixture: the clamps can't hold this reliably by friction (the
-           collision box is far smaller than the visible mesh), so gripping
-           attaches the bag rigidly instead. gz-sim 8's DetachableJoint has no
-           <suppress_initial_attach>, but it stays detached here because the
-           robot model doesn't exist yet when the world loads. -->
 </model>
 
     <model name="bag_red_3">
@@ -215,11 +204,6 @@
           <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
         </collision>
       </link>
-          <!-- Grasp fixture: the clamps can't hold this reliably by friction (the
-           collision box is far smaller than the visible mesh), so gripping
-           attaches the bag rigidly instead. gz-sim 8's DetachableJoint has no
-           <suppress_initial_attach>, but it stays detached here because the
-           robot model doesn't exist yet when the world loads. -->
 </model>
 
     <!-- ==================== Pallet B: sort destination for BLUE bags (starts empty) ==================== -->
@@ -256,11 +240,6 @@
           <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
         </collision>
       </link>
-          <!-- Grasp fixture: the clamps can't hold this reliably by friction (the
-           collision box is far smaller than the visible mesh), so gripping
-           attaches the bag rigidly instead. gz-sim 8's DetachableJoint has no
-           <suppress_initial_attach>, but it stays detached here because the
-           robot model doesn't exist yet when the world loads. -->
 </model>
 
     <model name="bag_blue_2">
@@ -305,11 +284,6 @@
           <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
         </collision>
       </link>
-          <!-- Grasp fixture: the clamps can't hold this reliably by friction (the
-           collision box is far smaller than the visible mesh), so gripping
-           attaches the bag rigidly instead. gz-sim 8's DetachableJoint has no
-           <suppress_initial_attach>, but it stays detached here because the
-           robot model doesn't exist yet when the world loads. -->
 </model>
 
     <!-- ==================== Tables ==================== -->
