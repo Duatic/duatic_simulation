@@ -23,6 +23,7 @@
 // on hardware; the /sim namespace is meant to make that obvious at a glance, and there
 // is deliberately no skill descriptor so the UI never offers it as a building block.
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <set>
@@ -396,11 +397,14 @@ private:
     if (!watched_.insert(topic).second) {
       return;
     }
-    gz_.Subscribe<gz::msgs::StringMsg>(
-      topic, [this, topic](const gz::msgs::StringMsg & msg) {
+    // Typed through std::function rather than a template argument on Subscribe: the type
+    // cannot be deduced from a lambda, and gz-transport 15 takes a parameter pack there.
+    std::function<void(const gz::msgs::StringMsg &)> onState =
+      [this, topic](const gz::msgs::StringMsg & msg) {
         std::lock_guard<std::mutex> lock(state_mutex_);
         state_[topic] = msg.data();
-      });
+      };
+    gz_.Subscribe(topic, onState);
   }
 
   gz::transport::Node gz_;
