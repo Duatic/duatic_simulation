@@ -9,16 +9,19 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 # gz-transport rather than the `gz` CLI: a service call should not cost a process.
-# Both come from the ROS vendor packages, so no extra system dependency.
-find_package(gz-transport13 REQUIRED)
-find_package(gz-msgs10 REQUIRED)
+# The vendor packages put an unversioned config on the prefix path, so each ROS distro
+# resolves the Gazebo version it ships instead of this file naming one.
+find_package(gz_transport_vendor REQUIRED)
+find_package(gz-transport REQUIRED)
+find_package(gz_msgs_vendor REQUIRED)
+find_package(gz-msgs REQUIRED)
 find_package(duatic_helper_msgs REQUIRED)
 
 add_executable(sim_scene_node src/sim_scene_node.cpp)
 target_link_libraries(sim_scene_node
   rclcpp::rclcpp
-  gz-transport13::core
-  gz-msgs10::core
+  gz-transport::core
+  gz-msgs::core
   ${duatic_helper_msgs_TARGETS}
 )
 

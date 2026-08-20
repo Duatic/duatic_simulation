@@ -9,25 +9,24 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>rclpy</depend>
-  <depend>rclcpp</depend>
-  <depend>gz_transport_vendor</depend>
-  <depend>gz_msgs_vendor</depend>
   <depend>duatic_helper_msgs</depend>
+  <depend>gz_msgs_vendor</depend>
+  <depend>gz_transport_vendor</depend>
+  <depend>rclcpp</depend>
+  <depend>rclpy</depend>
 
+  <exec_depend>controller_manager_msgs</exec_depend>
+  <exec_depend>gz_ros2_control</exec_depend>
+  <exec_depend>ros2pkg</exec_depend>
   <exec_depend>ros_gz_bridge</exec_depend>
   <exec_depend>ros_gz_image</exec_depend>
   <exec_depend>ros_gz_sim</exec_depend>
-  <exec_depend>ros2pkg</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+  <test_depend>duatic_helpers</test_depend>
   <test_depend>launch_ros</test_depend>
   <test_depend>launch_testing_ament_cmake</test_depend>
-  <test_depend>duatic_helpers</test_depend>
-
-  <exec_depend>gz_ros2_control</exec_depend>
-  <exec_depend>controller_manager_msgs</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
