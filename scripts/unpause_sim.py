@@ -22,27 +22,9 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Unpause Gazebo once the robot's controllers are up.
-
-gazebo.launch.py starts the simulation paused so gravity cannot act on the
-robot's joints before ros2_control has claimed them (starting unpaused races
-controller activation against physics: on a slow/loaded machine the arms fall
-limp for the first seconds and can drag the hip over).
-
-This node polls controller_manager until every hardware component listed in
-``wait_hardware`` is active, then unpauses the world via the
-``/world/<world>/control`` Gazebo service and exits. With an empty
-``wait_hardware`` (robot-less worlds) it unpauses immediately, and the
-``timeout`` parameter is a safety net so the simulation never stays paused
-forever if the hardware fails to come up.
-
-Why hardware and not controllers: hardware components are activated by
-gz_ros2_control itself on wall time and go active even while the world is
-paused. Controller spawners, however, run on sim time — they stall until
-physics runs, so gating the unpause on *controller* activation would
-deadlock. The remaining window between unpause and the trajectory
-controllers claiming the joints is covered by the controller_manager's
-``hold_joints`` parameter.
+"""
+Unpause Gazebo once ros2_control holds the joints.
+The world starts paused so gravity cannot pull the arms down before then.
 """
 
 import subprocess
