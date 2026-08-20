@@ -1,27 +1,26 @@
-// Copyright 2026 Duatic AG
-// Duatic Commercial License 1.0 (DCL-1)
-
-// Welds Gazebo models together on request, and releases them again.
-//
-// Gazebo offers no service for this. Its DetachableJoint system has to be declared in
-// SDF per pair, and gz-sim 8 has no suppress_initial_attach, so anything declared is
-// welded from the moment the world loads and dragged along as the robot drives. This
-// node injects the system at call time through the world's entity/system/add service,
-// which is what allows arbitrary pairs.
-//
-// C++ rather than Python because gz-transport has no Python bindings: the alternative
-// is shelling out to the `gz` CLI, which costs a process per call and parses
-// human-readable output. Everything needed is already available through the ROS
-// vendor packages — gz-transport13 and gz-msgs10, including entity_plugin_v.
-//
-// Welding only — no levelling, deliberately. "Level" cannot be written generically:
-// zeroing roll and pitch is what it means for most models, but a mesh whose long axis
-// runs along local z needs a 90 degree roll to lie down at all, and zeroing it stands
-// the object on its end. Only the caller knows its model's convention.
-//
-// Simulation only. Nothing above this should depend on it, or that thing will not run
-// on hardware; the /sim namespace is meant to make that obvious at a glance, and there
-// is deliberately no skill descriptor so the UI never offers it as a building block.
+/*
+ * Copyright 2026 Duatic AG
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ * following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ * disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ * following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
+ * products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <functional>
 #include <map>
@@ -56,6 +55,8 @@ constexpr char kDetachableJointFile[] = "gz-sim-detachable-joint-system";
 constexpr unsigned int kGzTimeoutMs = 5000;
 }  // namespace
 
+/** Welds Gazebo models together on request and releases them again, by injecting a
+ *  DetachableJoint at call time. Declared in SDF it would be welded from world load. */
 class SimSceneNode : public rclcpp::Node
 {
 public:
@@ -291,11 +292,8 @@ private:
     RCLCPP_INFO(get_logger(), "%s", res->message.c_str());
   }
 
-  /** Detach, and do not report it until the plugin says it happened.
-   *
-   * The plugin reports "detached" on its output topic. Publishing on the detach topic only
-   * says the request went out, so the answer is what a release is confirmed by.
-   */
+  /** Detach and wait for the plugin to report "detached". Publishing on the detach
+   *  topic only means the request went out, not that the joint is gone. */
   bool detachAndConfirm(const std::string & tag, const std::string & child)
   {
     watchState(tag, child);
@@ -322,14 +320,8 @@ private:
     return false;
   }
 
-  // Publish on an attach/detach topic, keeping the publisher alive and waiting for the
-  // DetachableJoint plugin to connect first.
-  //
-  // Advertising and publishing in the same breath loses the message: gz-transport needs
-  // a moment to wire publisher to subscriber, and until it has, Publish() succeeds while
-  // nothing receives it — so a detach reports success while the load stays welded, and
-  // the next attach closes the very loop this node exists to prevent. Publishers are
-  // cached because re-advertising the same topic starts the race over.
+  // Wait for the plugin to connect before publishing: until it has, Publish() reports
+  // success into the void. Publishers are cached because re-advertising restarts the wait.
   bool publishOn(const std::string & topic)
   {
     auto it = pubs_.find(topic);

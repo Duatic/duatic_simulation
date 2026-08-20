@@ -116,7 +116,7 @@
       </link>
     </model>
 
-    <!-- ==================== Pallet A: sort destination for RED bags (starts empty) ==================== -->
+    <!-- ==================== Pallet A bags (starts empty) ==================== -->
     <model name="pallet_a">
       <static>true</static>
       <pose>-3.5 2.5 0 0 3.14159 0</pose>
@@ -130,11 +130,6 @@
       </link>
     </model>
 
-    <!-- Mixed bags start stacked on the 3 tables; the app sorts them onto the pallets by
-    colour. Both colours are saturated on purpose: SAM3 keys on prompts like
-    "red object" / "blue object", and a white bag would collide with the robot's
-    own white arms in the camera image.
- -->
     <model name="bag_red_1">
       <static>false</static>
       <pose>-3.5 -2.5 0.85 1.5708 0 1.5708</pose>
@@ -155,11 +150,6 @@
           <geometry><box><size>0.2 0.1 0.1</size></box></geometry>
         </collision>
       </link>
-          <!-- Grasp fixture: the clamps can't hold this reliably by friction (the
-           collision box is far smaller than the visible mesh), so gripping
-           attaches the bag rigidly instead. gz-sim 8's DetachableJoint has no
-           <suppress_initial_attach>, but it stays detached here because the
-           robot model doesn't exist yet when the world loads. -->
 </model>
 
     <model name="bag_red_2">
@@ -206,7 +196,7 @@
       </link>
 </model>
 
-    <!-- ==================== Pallet B: sort destination for BLUE bags (starts empty) ==================== -->
+    <!-- ==================== Pallet B ==================== -->
     <model name="pallet_b">
       <static>true</static>
       <pose>3.5 2.5 0 0 3.14159 0</pose>
@@ -287,7 +277,6 @@
 </model>
 
     <!-- ==================== Tables ==================== -->
-    <!-- Table 1: destination for white bags -->
     <model name="table_1">
       <static>true</static>
       <pose>-3.5 -2.5 0.20 0 0 1.5708</pose>
@@ -301,7 +290,6 @@
       </link>
     </model>
 
-    <!-- Table 2: destination for blue bags -->
     <model name="table_2">
       <static>true</static>
       <pose>3.5 -2.5 0.20 0 0 1.5708</pose>
@@ -315,7 +303,6 @@
       </link>
     </model>
 
-    <!-- Table 3: spare / staging, no assigned bag color -->
     <model name="table_3">
       <static>true</static>
       <pose>0 -2.5 0.20 0 0 1.5708</pose>

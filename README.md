@@ -131,8 +131,8 @@ ros2 run duatic_gazebo start_sim.py --ros-args -p world:=warehouse -p headless:=
 - **duatic_empty**: Minimal environment for basic testing
 - **warehouse**: AWS RoboMaker warehouse with shelves, pallets, and clutter
 - **bag_lifting**: Demo booth with a wall, pallet, table, and rice bags, used for pick/place demos
-- **bag_sorting**: Six bags on three tables, sorted onto two pallets by colour
-- **bag_sorting_single**: One bag on the middle table, for the pick/place demo
+- **bag_sorting**: Six bags on three tables, can be sorted onto the pallets
+- **bag_sorting_single**: One bag on the middle table, for general application testing
 
 A world per scenario beats clearing objects at runtime: with the objects already in place,
 a fresh simulation is the reset. Occupancy maps live in `maps/`, one pair per world under

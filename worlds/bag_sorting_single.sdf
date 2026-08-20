@@ -2,9 +2,6 @@
 <sdf version="1.11">
   <world name="bag_sorting_single">
 
-    <!-- Asking for 1.0; a 4 ms step reaches about 0.8 on this hardware, which is close
-         enough that motions take roughly their commanded duration. Increase the step if
-         the bag starts jittering or creeping on the deck. -->
     <physics name="4ms" type="Bullet">
       <max_step_size>0.004</max_step_size>
       <real_time_factor>1.0</real_time_factor>
@@ -119,7 +116,7 @@
       </link>
     </model>
 
-    <!-- ==================== Pallet A: sort destination for RED bags (starts empty) ==================== -->
+    <!-- ==================== Pallet A ==================== -->
     <model name="pallet_a">
       <static>true</static>
       <pose>-3.5 2.5 0 0 3.14159 0</pose>
@@ -133,15 +130,7 @@
       </link>
     </model>
 
-    <!-- Mixed bags start stacked on the 3 tables; the app sorts them onto the pallets by
-    colour. Both colours are saturated on purpose: SAM3 keys on prompts like
-    "red object" / "blue object", and a white bag would collide with the robot's
-    own white arms in the camera image.
- -->
-
-
-
-    <!-- ==================== Pallet B: sort destination for BLUE bags (starts empty) ==================== -->
+    <!-- ==================== Pallet B ==================== -->
     <model name="pallet_b">
       <static>true</static>
       <pose>3.5 2.5 0 0 3.14159 0</pose>
@@ -155,24 +144,14 @@
       </link>
     </model>
 
-
-
-
-    <!-- Exactly one bag, on the middle table's front edge where the demo expects it. -->
     <model name="bag_blue_2">
       <static>false</static>
       <pose>0 -2.36 0.85 1.5708 0 1.5708</pose>
       <link name="link">
         <inertial>
-          <!-- Far below a real sack's 20 kg, deliberately. The arms are position-
-               commanded through gz_ros2_control and statically compliant: at 1 kg the
-               left elbow sits 0.106 rad short of its command against a 0.05 rad goal
-               tolerance, so the controller aborts a motion otherwise on target to a
-               millimetre. Torque is not the limit — 40 Nm available, about 9 asked.
-               The proper fix is the GravityCompensationController in duatic_controllers,
-               feeding the effort interface alongside the position JTC; until that is set
-               up for simulation the load stays light. Nothing about grasp forces is
-               being validated here. -->
+          <!-- Lowered the mass for sim only because the arms are somehow not correctly
+               setup for the simulation. As of now we only need this to test the general
+               application steps. -->
           <mass>0.2</mass>
           <inertia><ixx>0.02</ixx><iyy>0.02</iyy><izz>0.02</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
         </inertial>

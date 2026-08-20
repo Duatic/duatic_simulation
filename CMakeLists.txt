@@ -8,9 +8,6 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-# gz-transport rather than the `gz` CLI: a service call should not cost a process.
-# The vendor packages put an unversioned config on the prefix path, so each ROS distro
-# resolves the Gazebo version it ships instead of this file naming one.
 find_package(gz_transport_vendor REQUIRED)
 find_package(gz-transport REQUIRED)
 find_package(gz_msgs_vendor REQUIRED)
