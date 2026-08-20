@@ -7,14 +7,28 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(gz_transport_vendor REQUIRED)
+find_package(gz-transport REQUIRED)
+find_package(gz_msgs_vendor REQUIRED)
+find_package(gz-msgs REQUIRED)
+find_package(duatic_helper_msgs REQUIRED)
+
+add_executable(sim_scene_node src/sim_scene_node.cpp)
+target_link_libraries(sim_scene_node
+  rclcpp::rclcpp
+  gz-transport::core
+  gz-msgs::core
+  ${duatic_helper_msgs_TARGETS}
+)
+
+install(TARGETS sim_scene_node DESTINATION lib/${PROJECT_NAME})
 
 # Install  directories
 install(DIRECTORY
   launch
   worlds
+  maps
   models
   docker
   urdf
@@ -24,6 +38,7 @@ install(DIRECTORY
 # Install scripts as executables
 install(PROGRAMS
   scripts/start_sim.py
+  scripts/unpause_sim.py
   DESTINATION lib/${PROJECT_NAME}/
 )
 
